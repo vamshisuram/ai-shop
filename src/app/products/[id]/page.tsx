@@ -4,6 +4,7 @@ import { getProduct, products } from "@/lib/products";
 import { ProductTile } from "@/components/product-tile";
 import { ProductCard } from "@/components/product-card";
 import { AddToCart } from "@/components/add-to-cart";
+import { ProductChat } from "@/components/product-chat";
 
 export function generateStaticParams() {
   return products.map((p) => ({ id: p.id }));
@@ -76,6 +77,7 @@ export default async function ProductPage({
               </li>
             ))}
           </ul>
+          <ProductChat product={product} />
         </div>
       </div>
 
