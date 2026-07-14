@@ -9,7 +9,9 @@ export default async function Home({
 }) {
   const { category } = await searchParams;
   const active = categories.find((c) => c === category);
-  const shown = active ? products.filter((p) => p.category === active) : products;
+  const shown = (active ? products.filter((p) => p.category === active) : products)
+    // photographed products lead the grid
+    .toSorted((a, b) => Number(Boolean(b.image)) - Number(Boolean(a.image)));
 
   return (
     <div className="mx-auto max-w-6xl px-5">
