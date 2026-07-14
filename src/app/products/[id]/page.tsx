@@ -40,8 +40,8 @@ export default async function ProductPage({
         <span className="text-ink">{product.name}</span>
       </nav>
 
-      <div className="grid gap-10 md:grid-cols-2 md:gap-14">
-        <div className="rise group">
+      <div className="grid items-start gap-10 md:grid-cols-2 md:gap-14">
+        <div className="rise group md:sticky md:top-24">
           <ProductTile product={product} size="lg" />
         </div>
 
