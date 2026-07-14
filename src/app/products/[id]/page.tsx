@@ -43,6 +43,11 @@ export default async function ProductPage({
       <div className="grid items-start gap-10 md:grid-cols-2 md:gap-14">
         <div className="rise group md:sticky md:top-24">
           <ProductTile product={product} size="lg" />
+          {product.image && (
+            <p className="mt-2 text-right text-xs text-ink-soft/70">
+              {product.image.credit}
+            </p>
+          )}
         </div>
 
         <div className="rise" style={{ animationDelay: "100ms" }}>

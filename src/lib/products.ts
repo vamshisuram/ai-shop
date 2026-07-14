@@ -8,6 +8,8 @@ export type Product = {
   details: string[];
   emoji: string;
   tile: { from: string; to: string };
+  /** Product photo in /public; falls back to the emoji tile when absent. */
+  image?: { src: string; alt: string; credit: string };
   /** Structured spec sheet — fabric, color, finish, dimensions, care, etc. */
   attributes?: { label: string; value: string }[];
   /** Sizing chart for apparel */
@@ -170,18 +172,23 @@ export const products: Product[] = [
     category: "Clothing",
     tagline: "A shirt-jacket for the eight months of almost-cold.",
     description:
-      "An overshirt cut from heavyweight Portuguese cotton flannel, brushed on both faces until it feels like a blanket you're allowed to wear to dinner. The ember-plaid pattern is yarn-dyed, so the color runs through the cloth rather than sitting on it — it fades the way denim does, not the way prints do. Cut roomy enough to layer over a heavy hoodie, structured enough to wear over a tee without looking borrowed. Corozo-nut buttons, double-needle felled seams, and two chest pockets that actually fit a phone and a notebook.",
+      "An overshirt cut from heavyweight Portuguese cotton flannel, brushed on both faces until it feels like a blanket you're allowed to wear to dinner. The granite-plaid pattern is yarn-dyed, so the color runs through the cloth rather than sitting on it — it fades the way denim does, not the way prints do. Cut roomy enough to layer over a heavy hoodie, structured enough to wear over a tee without looking borrowed. Corozo-nut buttons, double-needle felled seams, and two chest pockets that actually fit a phone and a notebook.",
     details: [
       "Heavyweight 11 oz Portuguese cotton flannel",
-      "Yarn-dyed ember plaid — fades, never peels",
+      "Yarn-dyed granite plaid — fades, never peels",
       "Corozo-nut buttons, felled seams",
       "Two chest pockets + two hidden side-seam pockets",
     ],
     emoji: "👔",
-    tile: { from: "#7a3327", to: "#a85438" },
+    tile: { from: "#55534d", to: "#8a887f" },
+    image: {
+      src: "/products/harbor-flannel-overshirt.jpg",
+      alt: "Close-up of a grey and ecru plaid flannel overshirt with a buttoned chest pocket",
+      credit: "Photo by Jonathan Adams on Unsplash",
+    },
     attributes: [
       { label: "Fabric", value: "100% long-staple Portuguese cotton flannel, 11 oz/yd²" },
-      { label: "Color", value: "Ember plaid — rust red and charcoal check on an oat ground" },
+      { label: "Color", value: "Granite plaid — charcoal and grey check on an ecru ground" },
       { label: "Texture", value: "Double-brushed on both faces; dense, blanket-soft nap with visible twill diagonal" },
       { label: "Weave", value: "3/1 twill, yarn-dyed before weaving" },
       { label: "Fit", value: "Relaxed overshirt fit — order true size to layer over a tee, size down for a trim fit" },
@@ -220,9 +227,14 @@ export const products: Product[] = [
     ],
     emoji: "🧶",
     tile: { from: "#3d4f38", to: "#66795a" },
+    image: {
+      src: "/products/meridian-merino-crew.jpg",
+      alt: "Folded sea-moss green knit sweater beside a mug of coffee on a white table",
+      credit: "Photo by rocknwool on Unsplash",
+    },
     attributes: [
       { label: "Fabric", value: "100% extra-fine merino wool, 18.5 micron, spun in Biella, Italy" },
-      { label: "Color", value: "Moss heather — a green-grey melange spun from moss, sage, and slate fibers" },
+      { label: "Color", value: "Sea-moss heather — a soft green melange with grey undertones" },
       { label: "Texture", value: "Smooth 12-gauge jersey knit face; soft with a dry, matte hand — no itch at the neck" },
       { label: "Knit", value: "12-gauge, fully-fashioned (shaped on the machine, linked at the seams)" },
       { label: "Fit", value: "Classic fit with a slightly trimmed waist; true to size" },
@@ -261,6 +273,11 @@ export const products: Product[] = [
     ],
     emoji: "📚",
     tile: { from: "#6e4f2f", to: "#9c7a4a" },
+    image: {
+      src: "/products/ledger-oak-bookshelf.jpg",
+      alt: "Tall oak bookshelf bays filled with books, with drawers at the base",
+      credit: "Photo by Pickawood on Unsplash",
+    },
     attributes: [
       { label: "Materials", value: "Solid quartersawn American white oak; hardwood wedges in walnut" },
       { label: "Finish", value: "Natural hardwax oil — matte, open-pore; spot-repairable with a supplied touch-up cloth" },
@@ -292,6 +309,11 @@ export const products: Product[] = [
     ],
     emoji: "🛋️",
     tile: { from: "#8d8578", to: "#bdb3a0" },
+    image: {
+      src: "/products/haven-lounge-chair.jpg",
+      alt: "Ivory bouclé lounge chair with wooden legs in a bright reading corner",
+      credit: "Photo by Kailun Zhang on Unsplash",
+    },
     attributes: [
       { label: "Frame", value: "Steam-bent solid white ash, continuous single-piece arms; webbed beech seat platform" },
       { label: "Upholstery", value: "78% wool / 22% polyamide bouclé, 620 g/m² heavy loop pile" },
