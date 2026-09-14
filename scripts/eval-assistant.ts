@@ -4,8 +4,13 @@
  *
  * Usage: npm run eval:assistant [-- --base-url http://localhost:3000]
  */
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { chromium } from "playwright";
 import { goldenCases, looksLikeDecline } from "../src/lib/assistant.golden";
+
+// MODEL=large swaps to Gemma 2 2B via the in-page model switcher.
+const model = process.env.MODEL === "large" ? "large" : "small";
 
 const baseUrl = process.argv.includes("--base-url")
   ? process.argv[process.argv.indexOf("--base-url") + 1]
@@ -18,12 +23,34 @@ async function main() {
     process.exit(1);
   }
 
-  // Headless Chromium gets no real WebGPU adapter on macOS; run headed unless forced.
-  const browser = await chromium.launch({
-    headless: process.env.HEADLESS === "1",
-    args: ["--enable-unsafe-webgpu", "--enable-features=Vulkan"],
-  });
+  // Persistent profile on two counts: a throwaway one blows the Cache Storage quota
+  // on the 1.9 GB model, and it re-downloads the weights on every single run.
+  // Headless Chromium gets no real WebGPU adapter on macOS, so run headed unless forced.
+  const browser = await chromium.launchPersistentContext(
+    join(tmpdir(), "ai-shop-eval-profile"),
+    {
+      headless: process.env.HEADLESS === "1",
+      args: ["--enable-unsafe-webgpu", "--enable-features=Vulkan"],
+    }
+  );
   const page = await browser.newPage();
+
+  // The load button unmounts the moment loading starts, so waiting for it to hide
+  // proves nothing — wait for the input that only exists once ready, and race it
+  // against the two phases that never get there.
+  const waitForReady = async () => {
+    const ready = page.getByPlaceholder(/ask about/i);
+    const broke = page.getByText(/doesn.t support WebGPU|Couldn.t load the model/i);
+    await Promise.race([
+      ready.waitFor({ timeout: 600_000 }),
+      broke.waitFor({ timeout: 600_000 }),
+    ]);
+    if (await broke.isVisible()) {
+      console.error(`Assistant never loaded: ${await broke.innerText()}`);
+      await browser.close();
+      process.exit(1);
+    }
+  };
 
   let pass = 0;
   let fail = 0;
@@ -33,19 +60,10 @@ async function main() {
     if (testCase.productId !== lastProductId) {
       await page.goto(`${baseUrl}/products/${testCase.productId}`);
       await page.getByRole("button", { name: /load assistant/i }).click();
-      // The load button unmounts the moment loading starts, so waiting for it to
-      // hide proves nothing — wait for the input that only exists once ready, and
-      // race it against the two phases that never get there.
-      const ready = page.getByPlaceholder(/ask about/i);
-      const broke = page.getByText(/doesn.t support WebGPU|Couldn.t load the model/i);
-      await Promise.race([
-        ready.waitFor({ timeout: 300_000 }),
-        broke.waitFor({ timeout: 300_000 }),
-      ]);
-      if (await broke.isVisible()) {
-        console.error(`Assistant never loaded: ${await broke.innerText()}`);
-        await browser.close();
-        process.exit(1);
+      await waitForReady();
+      if (model === "large") {
+        await page.getByRole("button", { name: /switch to sharper/i }).click();
+        await waitForReady();
       }
       lastProductId = testCase.productId;
     }
@@ -76,7 +94,7 @@ async function main() {
   }
 
   await browser.close();
-  console.log(`\n${pass} passed, ${fail} failed, ${goldenCases.length} total`);
+  console.log(`\n[${model}] ${pass} passed, ${fail} failed, ${goldenCases.length} total`);
   process.exit(fail > 0 ? 1 : 0);
 }
 

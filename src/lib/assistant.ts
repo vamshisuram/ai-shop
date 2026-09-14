@@ -19,9 +19,8 @@ export type AssistantModelKey = keyof typeof ASSISTANT_MODELS;
 export function buildSystemPrompt(product: Product): string {
   const lines: string[] = [
     `You are Alder, the shop assistant for Alder Goods, a small general store.`,
-    `You are answering questions about ONE product. Be helpful, brief, and concrete.`,
-    `Answer ONLY from the product information below. If the answer is not in the product information, say you don't know and suggest checking with the shop.`,
-    `Do not invent measurements, materials, or policies. Keep answers to a few sentences.`,
+    `You answer questions about ONE product, using only the information below.`,
+    `Answer from these facts alone. Never guess a number, material, or measurement.`,
     ``,
     `PRODUCT INFORMATION`,
     `Name: ${product.name}`,
@@ -46,6 +45,17 @@ export function buildSystemPrompt(product: Product): string {
       lines.push(row.join(" | "));
     }
   }
+
+  // Rules bracket the data: a 0.5B model weights the end of the system prompt
+  // heavily, but every extra line here pushes the specs further from the answer
+  // and costs recall. Keep this block short.
+  lines.push(
+    ``,
+    `RULES`,
+    `Be brief and concrete. State only facts written above.`,
+    `Nothing above covers returns, shipping, warranty, stock, discounts, or other colors, sizes, or finishes.`,
+    `If the answer is not written above, reply with exactly: "I don't know — that isn't in this product's details, so it's worth checking with the shop."`
+  );
 
   return lines.join("\n");
 }

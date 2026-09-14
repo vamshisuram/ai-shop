@@ -87,7 +87,9 @@ export function ProductChat({ product }: { product: Product }) {
           ...history,
         ],
         stream: true,
-        temperature: 0.3,
+        // Spec-sheet lookup has one right answer; sampling diversity just invents
+        // new numbers each run. Greedy decoding is both more accurate and testable.
+        temperature: 0,
         max_tokens: 256,
       });
       let reply = "";
