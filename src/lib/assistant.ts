@@ -46,15 +46,19 @@ export function buildSystemPrompt(product: Product): string {
     }
   }
 
-  // Rules bracket the data: a 0.5B model weights the end of the system prompt
-  // heavily, but every extra line here pushes the specs further from the answer
-  // and costs recall. Keep this block short.
+  // Rules go after the data, not above it: attention favors the end of the prompt,
+  // so an instruction sitting on top of a wall of specs competes with all of it.
+  // Measured on Qwen 0.5B at temperature 0 (npm run eval:assistant): this explicit
+  // wording scores 8/12, a terser three-line version of the same rules 6/12. Being
+  // long-winded here is load-bearing — don't tidy it down without re-running.
   lines.push(
     ``,
     `RULES`,
-    `Be brief and concrete. State only facts written above.`,
-    `Nothing above covers returns, shipping, warranty, stock, discounts, or other colors, sizes, or finishes.`,
-    `If the answer is not written above, reply with exactly: "I don't know — that isn't in this product's details, so it's worth checking with the shop."`
+    `Be helpful, brief, and concrete. Keep answers to a few sentences.`,
+    `Every fact you state must appear in PRODUCT INFORMATION above. Never guess or estimate a number, material, or measurement that is not written there.`,
+    `The information above is ONLY about this one product. It says nothing about returns, refunds, exchanges, shipping, delivery times, warranties, guarantees, stock, discounts, or other colors, sizes, finishes, or variants.`,
+    `If you are asked about any of those, or about anything else not written above, reply with exactly this sentence and nothing more:`,
+    `"I don't know — that isn't in this product's details, so it's worth checking with the shop."`
   );
 
   return lines.join("\n");
